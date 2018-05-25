@@ -45,6 +45,7 @@ public class HeroController {
 	 */
 	@RequestMapping(method = RequestMethod.POST)
 	public Hero saveHero(@RequestBody Hero hero) {
+		log.debug("등록 요청:"+ hero);
 		Long nextId = 0L;
 		if (this.heros.size() != 0) {
 			//마지막까지 skip > findFirst(= 마지막 hero) > +1 새로 부여할 아이디 > 추가하여 저장
@@ -52,12 +53,11 @@ public class HeroController {
 			nextId = lastHero.getId() + 1;
 		}
 		
-		log.info("save Hero");
-
 		hero.setId(nextId);
 		this.heros.add(hero);
+		
+		log.debug("등록 완료:"+ hero);
 		return hero;
-
 	}
 
 	/**
@@ -66,11 +66,12 @@ public class HeroController {
 	 * @return
 	 */
 	@RequestMapping(method = RequestMethod.PUT)
-	public Hero updateHero(@RequestBody Hero hero) {		
+	public Hero updateHero(@RequestBody Hero hero) {	
+		log.debug("업데이트 전:"+ hero);
 		Hero modifiedHero = this.heros.stream().filter(u -> u.getId() == hero.getId()).findFirst().orElse(null);
 		modifiedHero.setName(hero.getName());
 		
-		log.info("update Hero");
+		log.debug("업데이트 후:"+ hero);
 		return modifiedHero;
 	}
 
