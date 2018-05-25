@@ -2,13 +2,10 @@ package myspringboot.hero;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,10 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/heros")
 public class HeroController {
-
+	
 	private List<Hero> heros = new ArrayList<>();	
 	
-	//private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	HeroController() {
 		buildHeros();
@@ -30,11 +27,13 @@ public class HeroController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public List<Hero> getHeros() {
+		log.debug("목록조회");
 		return this.heros;
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public Hero getHero(@PathVariable("id") Long id) {
+		log.debug("상세조회["+id+"]");
 		return this.heros.stream().filter(hero -> hero.getId() == id).findFirst().orElse(null);
 	}
 
@@ -51,6 +50,8 @@ public class HeroController {
 			Hero lastHero = this.heros.stream().skip(this.heros.size() - 1).findFirst().orElse(null);
 			nextId = lastHero.getId() + 1;
 		}
+		
+		log.info("save Hero");
 
 		hero.setId(nextId);
 		this.heros.add(hero);
@@ -67,6 +68,8 @@ public class HeroController {
 	public Hero updateHero(@RequestBody Hero hero) {		
 		Hero modifiedHero = this.heros.stream().filter(u -> u.getId() == hero.getId()).findFirst().orElse(null);
 		modifiedHero.setName(hero.getName());
+		
+		log.info("update Hero");
 		return modifiedHero;
 	}
 
@@ -80,8 +83,10 @@ public class HeroController {
 		Hero deleteHero = this.heros.stream().filter(hero -> hero.getId() == id).findFirst().orElse(null);
 		if (deleteHero != null) {
 			this.heros.remove(deleteHero);
+			log.info("delete Hero");
 			return true;
 		} else  {
+			log.info("delete Hero : no user");
 			return false;
 		}
 	}
@@ -94,6 +99,7 @@ public class HeroController {
 	@RequestMapping(value ="/name/{name}", method = RequestMethod.GET)
 	public List<Hero> searchHeroes(@PathVariable String name){
 		//java 1.8 이상 사용 가능한 코드
+		log.info("search Hero ");
 		return this.heros.stream().filter(hero -> hero.getName().contains(name)).collect(Collectors.toList());
 	}
 	
